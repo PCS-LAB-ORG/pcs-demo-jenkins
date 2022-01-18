@@ -1,5 +1,8 @@
-FROM imiell/bad-dockerfile:latest
-# FROM alpine:latest
+# FROM imiell/bad-dockerfile:latest
+FROM alpine:latest
+RUN useradd -u 8877 john
+# Change to non-root privilege
+USER john
 
 # FROM tomcat:8.0.36-jre8
 # RUN rm -rf /usr/local/tomcat/webapps/*
