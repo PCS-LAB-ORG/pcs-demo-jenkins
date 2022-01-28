@@ -1,5 +1,5 @@
-# imiell/bad-dockerfile:latest
-FROM alpine:latest
+FROM imiell/bad-dockerfile:latest
+# FROM alpine:latest
 
 # FROM tomcat:8.0.36-jre8
 # RUN rm -rf /usr/local/tomcat/webapps/*
