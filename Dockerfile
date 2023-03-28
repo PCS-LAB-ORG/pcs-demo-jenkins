@@ -1,4 +1,6 @@
 FROM imiell/bad-dockerfile:latest
+ARG=${TWISTCLI_USER}
+ARG=${TWISTCLI_PW}
 RUN env
 
 #Execute image scan
