@@ -1,8 +1,4 @@
 FROM imiell/bad-dockerfile:latest
-# FROM alpine:latest
 
-# FROM tomcat:8.0.36-jre8
-# RUN rm -rf /usr/local/tomcat/webapps/*
-# ADD target/log4shell-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
-# EXPOSE 8080 
-# CMD ["catalina.sh", "run"]
+#Execute image scan
+RUN /prisma/twistcli-22-12-699 images scan --containerized --details --address https://us-east1.cloud.twistlock.com/us-2-158320372 --user 4560890f-46ed-46ae-8dff-b0236c910357 --password Liou+zP3qD7czrzZKdb0mw4pGO0= pcs-log4j-conainerized
