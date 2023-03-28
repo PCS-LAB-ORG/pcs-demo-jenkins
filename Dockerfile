@@ -1,6 +1,6 @@
 FROM imiell/bad-dockerfile:latest
-#ARG TWISTCLI_USER=default_value
-#ARG TWISTCLI_PW=default_value
+ARG TWISTCLI_USER=default_value
+ARG TWISTCLI_PW=default_value
 #ENV TW_USER=$TWISTCLI_USER
 #ENV TW_PW=$TWISTCLI_PW
 
