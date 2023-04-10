@@ -1,0 +1,118 @@
+pipeline {
+    agent {label "docker"}
+
+// Declare Pipeline Environment Variables
+    environment {
+        AWS_ACCOUNT_ID="886388100502"
+        AWS_DEFAULT_REGION="us-east-1"
+        JENKINS_AWS_CREDENTIAL_NAME="aws-ecr-cred-v2"
+        LOCAL_DOCKER_IMAGE_REPO="pcs-jenkins-demo/jenkins-log4j"
+        LOCAL_DOCKER_IMAGE_TAG="0.3"
+        ECR_IMAGE_TAG="0.3"
+        ECR_IMAGE_REPO_NAME="pcs-ecr-demo/jenkins-log4j"
+        ECR_SERVER="ecr:${env.AWS_DEFAULT_REGION}"
+        ECR_DOCKER_CREDENTIAL="${env.ECR_SERVER}:${env.JENKINS_AWS_CREDENTIAL_NAME}"
+        ECR_REPOSITORY_URL="https://${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+        GITHUB_REPO_URL="https://github.com/PCS-LAB-ORG/pcs-demo-jenkins.git"
+        CODE_REPO_SCAN_NAME="PCS Demo Log4J Code"
+    }
+
+//BEGIN Pipeline Actions / Stages
+    stages {
+
+//Stage 1 - Display alll of the declared envrionment variables for troubleshooting and learning purposes       
+        stage("Environment Variables") {
+        steps {
+                script {
+                    // Echo global environment variables set for the registry configuration
+                    echo "JENKINS_AWS_CREDENTIAL_NAME=${env.JENKINS_AWS_CREDENTIAL_NAME}"
+                    echo "AWS_ACCOUNT_ID=${env.AWS_ACCOUNT_ID}"
+                    echo "AWS_DEFAULT_REGION=${env.AWS_DEFAULT_REGION}"
+                    echo "LOCAL_DOCKER_IMAGE_REPO=${LOCAL_DOCKER_IMAGE_REPO}"
+                    echo "LOCAL_DOCKER_IMAGE_TAG=${LOCAL_DOCKER_IMAGE_TAG}"
+                    echo "ECR_IMAGE_TAG=${env.ECR_IMAGE_TAG}"
+                    echo "ECR_IMAGE_REPO_NAME=${env.ECR_IMAGE_REPO_NAME}"
+                    echo "ECR_IMAGE_REPO_NAME=${env.IMAGE_REPO_NAME}"
+                    echo "ECR_SERVER=${env.ECR_SERVER}"
+                    echo "ECR_REPOSITORY_URL=${env.ECR_REPOSITORY_URL}"
+                    echo "ECR_DOCKER_CREDENTIALL=${env.ECR_DOCKER_CREDENTIAL}"
+                    echo "GITHUB_REPO_URL=${env.GITHUB_REPO_URL}"
+                }
+        }
+        }
+
+//Stage 2 - Checkout the GitHub repository defined by the specified environment variable
+        stage ('Code Repositories Checkout') {
+        steps {
+ 	        checkout([$class: 'GitSCM', branches: [[name: '**']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: env.GITHUB_REPO_URL]]])
+        }
+        } 
+
+//Stage 3 - Use the Prisma Cloud Plugin to scan the checked out code repository and the built docker image
+        stage('Prisma Cloud Code Scan') {
+        steps {
+            // Scan the code repository
+                /*
+                In this case the location of the repository is the root of the working directory '.'
+                Thee repository name is simply a variable that is used as the displayed "Repository Name" in the Prisma Cloud Console.
+                It does NOT actually match a directory name in the code repository itself
+                */
+            prismaCloudScanCode excludedPaths: '', explicitFiles: '', logLevel: 'info', pythonVersion: '', repositoryName: env.CODE_REPO_SCAN_NAME, repositoryPath: '.', resultsFile: 'prisma-cloud-code-scan-results.json'
+         }
+        }
+
+//Stage 4 - Build a docker image on the local host using repository and tag names defined by environment variables
+        stage('Container Image Build') {
+        steps {
+                // Build an image for scanning
+                sh 'docker build --no-cache -t ${LOCAL_DOCKER_IMAGE_REPO}:${LOCAL_DOCKER_IMAGE_TAG} .'
+        }
+        }
+
+//Stage 5 - Use the Prisma Cloud Plugin to scan the built docker image
+        stage('Prisma Cloud Container Image Scan') {
+        steps {
+                // Scan the built docker image specified by the environment variables
+                prismaCloudScanImage ca: '',
+                cert: '',
+                dockerAddress: 'unix:///var/run/docker.sock',
+                image: "${LOCAL_DOCKER_IMAGE_REPO}:${LOCAL_DOCKER_IMAGE_TAG}",
+                key: '',
+                logLevel: 'info',
+                podmanPath: '',
+                project: '',
+                resultsFile: 'prisma-cloud-image-scan-results.json',
+                ignoreImageBuildTime:true
+        }
+        }
+
+
+//Stage 6 - Push the image to an Amazon ECR image repository defined by the environment variables   
+        stage ('Push Image to Registry') {
+        steps {
+           script {
+                    docker.withRegistry(env.ECR_REPOSITORY_URL,env.ECR_DOCKER_CREDENTIAL) {
+                    def testimage = docker.build("${ECR_IMAGE_REPO_NAME}")
+                    testimage.push("${ECR_IMAGE_TAG}")
+            }
+            }
+        }
+        }
+
+    }
+// END Pipeline Actions/Stages
+    
+// Post-Build Actions - The post section lets you run the publish step regardless of the scan results
+    post {
+        always {
+                prismaCloudPublish resultsFilePattern: 'prisma-cloud-code-scan-results.json'
+                prismaCloudPublish resultsFilePattern: 'prisma-cloud-image-scan-results.json'
+			
+		/* REMOVE ATTEMPTED EMAIL NOTIFICATION FOR NOW
+			emailext attachLog: true, attachmentsPattern: '*.json', body: '$DEFAULT_CONTENT', subject: '$DEFAULT_SUBJECT', to: 'bgoldstein@paloaltonetworks.com'
+			emailextrecipients([developers()])
+			cleanWs()
+        */
+        }
+    }
+}
