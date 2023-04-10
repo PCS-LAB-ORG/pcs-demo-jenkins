@@ -1,0 +1,101 @@
+pipeline {
+    agent {label "jenkins-kaniko-agent"}
+
+// Declare Pipeline Environment Variables
+    environment {
+        GITHUB_REPO_URL="https://github.com/PCS-LAB-ORG/pcs-demo-jenkins.git"
+        CODE_REPO_SCAN_NAME="PCS Demo Log4J Code"
+        IMAGE_REGISTRY="docker.io"
+        IMAGE_REPO="/bgpanw/kaniko-log4j"
+        IMAGE_TAG=":1.5"
+        IMAGE_DESTINATION="${IMAGE_REGISTRY}${IMAGE_REPO}${IMAGE_TAG}"
+        DOCKERFILE_NAME="Dockerfile-kaniko"
+ 
+//Assign Docker Credentials to a pipeline environment variable
+//TEMPORARY COMMENT    DOCKER_CONFIG_JSON=credentials('bgoldstein-dockerhub-cred')
+
+//Assign Credentials from GCP Secrets Plugin to a pipeline environment variable
+        TWISTCLI_CRED=credentials('app2-pcs-lab-pcs-demo-cicd-svc')
+                }
+
+//BEGIN Pipeline Actions / Stages
+    stages {
+
+//Stage 0 - TROUBLESHOOTING: Display all of the declared envrionment variables for troubleshooting and learning purposes
+//This stage to display variables is only used for troubleshooting. Leave it commented out if everything is working properly
+/*
+        stage("Environment Variables") {
+            steps {
+                script {
+                    // Echo global environment variables set for the registry configuration
+                    
+                    echo "GITHUB_REPO_URL=${env.GITHUB_REPO_URL}"
+                    echo "CODE_REPO_SCAN_NAME=${env.CODE_REPO_SCAN_NAME}"
+                    echo "IMAGE_REGISTRY=${env.IMAGE_REGISTRY}"
+                    echo "IMAGE_REPO=${env.IMAGE_REPO}"
+                    echo "IMAGE_TAG=${env.IMAGE_TAG}"
+                    echo "IMAGE_DESTINATION=${env.IMAGE_DESTINATION}"
+                    echo "DOCKERFILE_NAME=${env.DOCKERFILE_NAME}"
+                    echo "TWISTCLI_USER=${env.TWISTCLI_CRED_USR}"
+                    echo "TWISTCLI_PW=${env.TWISTCLI_CRED_PSW}"
+                    echo "DOCKER_CONFIG_JSON="'$DOCKER_CONFIG_JSON'
+                        }
+              }
+        }
+*/
+
+//Stage 1 - Checkout the GitHub repository defined by the specified environment variable
+        stage ('Code Repositories Checkout') {
+            steps {
+ 	        checkout([$class: 'GitSCM', branches: [[name: '**']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: env.GITHUB_REPO_URL]]])
+              }
+        } 
+
+//Stage 2 - Use the Prisma Cloud Plugin to scan the checked out code repository and the built docker image
+        stage('Prisma Cloud Code Scan') {
+        steps {
+            // Scan the code repository
+                /*
+                In this case the location of the repository is the root of the working directory '.'
+                Thee repository name is simply a variable that is used as the displayed "Repository Name" in the Prisma Cloud Console.
+                It does NOT actually match a directory name in the code repository itself
+                */
+            prismaCloudScanCode excludedPaths: '', explicitFiles: '', logLevel: 'info', pythonVersion: '', repositoryName: env.CODE_REPO_SCAN_NAME, repositoryPath: '.', resultsFile: 'prisma-cloud-code-scan-results.json'
+         }
+        }
+
+//Stage 3 - Build a docker image using the Kaniko agent in GKE using the Dockerfile in the code repository
+//          TwistCLI is called from the Dockerfile build steps to scan the image using the --containerized flag
+        stage('Container Image Build') {
+            steps {
+                // Build a Docker image using our Kaniko build agent in GKE.
+                // Pass the username and password variables to the container environment using the --buildarg parameters
+                container('kaniko'){
+                    withCredentials([file(credentialsId: 'bgoldstein-dockerhub-cred', variable: 'DOCKER_CONFIG_JSON')]) {
+                            withEnv(['PATH+EXTRA=/busybox']) {
+                            sh '''#!/busybox/sh
+                                cp \$DOCKER_CONFIG_JSON /kaniko/.docker/config.json
+                                '''
+                                }
+                            }
+                    script{
+                        sh '''
+                        /kaniko/executor --dockerfile "`pwd`"/$DOCKERFILE_NAME \
+                                         --context "`pwd`" \
+                                         --destination=$IMAGE_DESTINATION \
+                                         --build-arg TWISTCLI_USER=$TWISTCLI_CRED_USR \
+                                         --build-arg TWISTCLI_PW=$TWISTCLI_CRED_PSW
+                            '''
+                          }
+                   }
+        }
+        }
+
+    }
+// Post-Build Actions - The post section lets you run the publish step regardless of the scan results
+    post {
+        always {
+                prismaCloudPublish resultsFilePattern: 'prisma-cloud-code-scan-results.json'
+                }   
+        }
+}
