@@ -81,8 +81,9 @@ pipeline {
                     script{
                         sh '''
                         /kaniko/executor --dockerfile "`pwd`"/$DOCKERFILE_NAME \
+                                         --cleanup \
+                                         --verbosity=info \
                                          --context "`pwd`" \
-                                         --cleanup
                                          --destination=$IMAGE_DESTINATION \
                                          --build-arg TWISTCLI_USER=$TWISTCLI_CRED_USR \
                                          --build-arg TWISTCLI_PW=$TWISTCLI_CRED_PSW
