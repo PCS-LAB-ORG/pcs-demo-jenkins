@@ -74,6 +74,7 @@ pipeline {
                     withCredentials([file(credentialsId: 'bgoldstein-dockerhub-cred', variable: 'DOCKER_CONFIG_JSON')]) {
                             withEnv(['PATH+EXTRA=/busybox']) {
                             sh '''#!/busybox/sh
+                                rm /kaniko/.docker/config.json
                                 cp \$DOCKER_CONFIG_JSON /kaniko/.docker/config.json
                                 '''
                                 }
