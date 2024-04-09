@@ -49,7 +49,8 @@ pipeline {
         } 
 
 //Stage 3 - Use the Prisma Cloud Plugin to scan the checked out code repository and the built docker image
-/* BEGIN MULTI-LINE COMMENT
+/*
+BEGIN MULTI-LINE COMMENT
 STAGE 3 IS BEING DISABLED AS OF April 9th, 2024. The Compute Code Scanning feature has been removed and this stage now breaks the pipeline
         stage('Prisma Cloud Code Scan') {
         steps {
@@ -62,7 +63,8 @@ STAGE 3 IS BEING DISABLED AS OF April 9th, 2024. The Compute Code Scanning featu
             prismaCloudScanCode excludedPaths: '', explicitFiles: '', logLevel: 'info', pythonVersion: '', repositoryName: env.CODE_REPO_SCAN_NAME, repositoryPath: '.', resultsFile: 'prisma-cloud-code-scan-results.json'
          }
         }
-END MULTI-LINE COMMENT */
+END MULTI-LINE COMMENT
+*/
 
 //Stage 4 - Build a docker image on the local host using repository and tag names defined by environment variables
         stage('Container Image Build') {
