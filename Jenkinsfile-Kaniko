@@ -52,6 +52,8 @@ pipeline {
         } 
 
 //Stage 2 - Use the Prisma Cloud Plugin to scan the checked out code repository and the built docker image
+/* BEGIN MULTI-LINE COMMENT
+STAGE 2 IS BEING DISABLED AS OF April 9th, 2024. The Compute Code Scanning feature has been removed and this stage now breaks the pipeline
         stage('Prisma Cloud Code Scan') {
         steps {
             // Scan the code repository
@@ -63,6 +65,7 @@ pipeline {
             prismaCloudScanCode excludedPaths: '', explicitFiles: '', logLevel: 'info', pythonVersion: '', repositoryName: env.CODE_REPO_SCAN_NAME, repositoryPath: '.', resultsFile: 'prisma-cloud-code-scan-results.json'
          }
         }
+END MULTI-LINE COMMENT */
 
 //Stage 3 - Build a docker image using the Kaniko agent in GKE using the Dockerfile in the code repository
 //          TwistCLI is called from the Dockerfile build steps to scan the image using the --containerized flag
