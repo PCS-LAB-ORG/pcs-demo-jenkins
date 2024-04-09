@@ -57,11 +57,9 @@ STAGE 2 IS BEING DISABLED AS OF April 9th, 2024. The Compute Code Scanning featu
         stage('Prisma Cloud Code Scan') {
         steps {
             // Scan the code repository
-                /*
-                In this case the location of the repository is the root of the working directory '.'
-                Thee repository name is simply a variable that is used as the displayed "Repository Name" in the Prisma Cloud Console.
-                It does NOT actually match a directory name in the code repository itself
-                */
+            //    In this case the location of the repository is the root of the working directory '.'
+            //    Thee repository name is simply a variable that is used as the displayed "Repository Name" in the Prisma Cloud Console.
+            //    It does NOT actually match a directory name in the code repository itself
             prismaCloudScanCode excludedPaths: '', explicitFiles: '', logLevel: 'info', pythonVersion: '', repositoryName: env.CODE_REPO_SCAN_NAME, repositoryPath: '.', resultsFile: 'prisma-cloud-code-scan-results.json'
          }
         }
