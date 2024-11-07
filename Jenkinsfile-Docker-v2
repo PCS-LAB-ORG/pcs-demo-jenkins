@@ -58,15 +58,15 @@ prismaCloudScanImage ca: '', cert: '', dockerAddress: 'unix:///var/run/docker.so
         	}
         					}
 
-
-
-
-// Post-Build Actions - The post section lets you run the publish step regardless of the scan results
+/* TROUBLESHOOTING POST BUILD ACTIONS - COMMENT OUT FOR NOW
+Post-Build Actions - The post section lets you run the publish step regardless of the scan results
     post {
         always {
                 prismaCloudPublish resultsFilePattern: 'prisma-cloud-image-scan-results.json'			
         	}	
     	}
+*/
+
 }
 // END Stages 
 
