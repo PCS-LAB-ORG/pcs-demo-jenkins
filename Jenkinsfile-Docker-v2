@@ -18,7 +18,7 @@ pipeline {
     }
 
 //BEGIN Pipeline Actions / Stages
-    stages {
+    stages 	{
 
 //Stage 1 - Display alll of the declared envrionment variables for troubleshooting and learning purposes       
         stage("Environment Variables") {
@@ -37,9 +37,9 @@ pipeline {
                     echo "ECR_REPOSITORY_URL=${env.ECR_REPOSITORY_URL}"
                     echo "ECR_DOCKER_CREDENTIALL=${env.ECR_DOCKER_CREDENTIAL}"
                     echo "GITHUB_REPO_URL=${env.GITHUB_REPO_URL}"
-                }
-        }
-        }
+                	}
+        	}
+        				}
 
 
 //Stage 4 - Build a docker image on the local host using repository and tag names defined by environment variables
@@ -47,25 +47,28 @@ pipeline {
         steps {
                 // Build an image for scanning
                 sh 'docker build --no-cache -t ${LOCAL_DOCKER_IMAGE_REPO}:${LOCAL_DOCKER_IMAGE_TAG} .'
-        }
-        }
+        	}
+        				}			
 
 //Stage 5 - Use the Prisma Cloud Plugin to scan the built docker image
         stage('Prisma Cloud Container Image Scan') {
         steps {
                 // Scan the built docker image specified by the environment variables
 prismaCloudScanImage ca: '', cert: '', dockerAddress: 'unix:///var/run/docker.sock', image: 'pcs-jenkins-demo/jenkins-log4j:0.3', key: '', logLevel: 'info', podmanPath: '', project: '', resultsFile: 'prisma-cloud-scan-results.json', sbom: ''
-        }
-        }
+        	}
+        					}
 
 
-// END Pipeline Actions/Stages
-    
+
+
 // Post-Build Actions - The post section lets you run the publish step regardless of the scan results
     post {
         always {
-                prismaCloudPublish resultsFilePattern: 'prisma-cloud-image-scan-results.json'
-			
-        }
-    }
+                prismaCloudPublish resultsFilePattern: 'prisma-cloud-image-scan-results.json'			
+        	}	
+    	}
+}
+// END Stages 
+
+// END Pipeline
 }
