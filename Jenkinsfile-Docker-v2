@@ -41,12 +41,16 @@ pipeline {
         }
         }
 
+/* we dont need this anymore because the Jenkins project is checking out this repo for us
+
 //Stage 2 - Checkout the GitHub repository defined by the specified environment variable
         stage ('Code Repositories Checkout') {
         steps {
  	        checkout([$class: 'GitSCM', branches: [[name: '**']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: env.GITHUB_REPO_URL]]])
         }
         } 
+
+*/
 
 //Stage 3 - Use the Prisma Cloud Plugin to scan the checked out code repository and the built docker image
 /*
