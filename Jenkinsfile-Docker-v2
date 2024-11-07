@@ -38,7 +38,7 @@ pipeline {
                     echo "ECR_REPOSITORY_URL=${env.ECR_REPOSITORY_URL}"
                     echo "ECR_DOCKER_CREDENTIALL=${env.ECR_DOCKER_CREDENTIAL}"
                     echo "GITHUB_REPO_URL=${env.GITHUB_REPO_URL}"
-		    echo "IMAGE_SCAN_RESULTS_FILE="${IMAGE_SCAN_RESULTS_FILE}"
+		    echo "IMAGE_SCAN_RESULTS_FILE=${IMAGE_SCAN_RESULTS_FILE}"
                 	}
         	}
         				}
