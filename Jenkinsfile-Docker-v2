@@ -68,14 +68,15 @@ pipeline {
         	}
         					}
 
-        post {
-            always {
-                prismaCloudPublish resultsFilePattern: 'prisma-cloud-image-scan-results.json'
-			        }
-            }
-
 }
 // END Stages 
+
+post {
+    always {
+	prismaCloudPublish resultsFilePattern: 'prisma-cloud-image-scan-results.json'
+			}
+    }
+
 
 // END Pipeline
 }
