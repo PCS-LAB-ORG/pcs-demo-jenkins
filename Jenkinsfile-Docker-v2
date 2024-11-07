@@ -3,18 +3,9 @@ pipeline {
 
 // Declare Pipeline Environment Variables
     environment {
-        AWS_ACCOUNT_ID="886388100502"
-        AWS_DEFAULT_REGION="us-east-1"
-        JENKINS_AWS_CREDENTIAL_NAME="aws-ecr-cred-v2"
         LOCAL_DOCKER_IMAGE_REPO="pcs-jenkins-demo/jenkins-log4j"
         LOCAL_DOCKER_IMAGE_TAG="0.3"
-        ECR_IMAGE_TAG="0.3"
-        ECR_IMAGE_REPO_NAME="pcs-ecr-demo/jenkins-log4j"
-        ECR_SERVER="ecr:${env.AWS_DEFAULT_REGION}"
-        ECR_DOCKER_CREDENTIAL="${env.ECR_SERVER}:${env.JENKINS_AWS_CREDENTIAL_NAME}"
-        ECR_REPOSITORY_URL="https://${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
         GITHUB_REPO_URL="https://github.com/PCS-LAB-ORG/pcs-demo-jenkins.git"
-        CODE_REPO_SCAN_NAME="PCS Demo Log4J Code"
 	IMAGE_SCAN_RESULTS_FILE="prisma-cloud-image-scan-results.json"
     }
 
@@ -26,17 +17,8 @@ pipeline {
         steps {
                 script {
                     // Echo global environment variables set for the registry configuration
-                    echo "JENKINS_AWS_CREDENTIAL_NAME=${env.JENKINS_AWS_CREDENTIAL_NAME}"
-                    echo "AWS_ACCOUNT_ID=${env.AWS_ACCOUNT_ID}"
-                    echo "AWS_DEFAULT_REGION=${env.AWS_DEFAULT_REGION}"
                     echo "LOCAL_DOCKER_IMAGE_REPO=${LOCAL_DOCKER_IMAGE_REPO}"
                     echo "LOCAL_DOCKER_IMAGE_TAG=${LOCAL_DOCKER_IMAGE_TAG}"
-                    echo "ECR_IMAGE_TAG=${env.ECR_IMAGE_TAG}"
-                    echo "ECR_IMAGE_REPO_NAME=${env.ECR_IMAGE_REPO_NAME}"
-                    echo "ECR_IMAGE_REPO_NAME=${env.IMAGE_REPO_NAME}"
-                    echo "ECR_SERVER=${env.ECR_SERVER}"
-                    echo "ECR_REPOSITORY_URL=${env.ECR_REPOSITORY_URL}"
-                    echo "ECR_DOCKER_CREDENTIALL=${env.ECR_DOCKER_CREDENTIAL}"
                     echo "GITHUB_REPO_URL=${env.GITHUB_REPO_URL}"
 		    echo "IMAGE_SCAN_RESULTS_FILE=${IMAGE_SCAN_RESULTS_FILE}"
                 	}
