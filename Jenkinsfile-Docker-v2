@@ -68,14 +68,11 @@ pipeline {
         	}
         					}
 
-/* TROUBLESHOOTING POST BUILD ACTIONS - COMMENT OUT FOR NOW
-Post-Build Actions - The post section lets you run the publish step regardless of the scan results
-    post {
-        always {
-                prismaCloudPublish resultsFilePattern: 'prisma-cloud-image-scan-results.json'			
-        	}	
-    	}
-*/
+        post {
+            always {
+                prismaCloudPublish resultsFilePattern: 'prisma-cloud-image-scan-results.json'
+			        }
+            }
 
 }
 // END Stages 
