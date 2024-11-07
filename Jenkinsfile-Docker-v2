@@ -41,33 +41,6 @@ pipeline {
         }
         }
 
-/* we dont need this anymore because the Jenkins project is checking out this repo for us
-
-//Stage 2 - Checkout the GitHub repository defined by the specified environment variable
-        stage ('Code Repositories Checkout') {
-        steps {
- 	        checkout([$class: 'GitSCM', branches: [[name: '**']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '', url: env.GITHUB_REPO_URL]]])
-        }
-        } 
-
-*/
-
-//Stage 3 - Use the Prisma Cloud Plugin to scan the checked out code repository and the built docker image
-/*
-BEGIN MULTI-LINE COMMENT
-STAGE 3 IS BEING DISABLED AS OF April 9th, 2024. The Compute Code Scanning feature has been removed and this stage now breaks the pipeline
-        stage('Prisma Cloud Code Scan') {
-        steps {
-            // Scan the code repository
-            // In this case the location of the repository is the root of the working directory '.'
-            // Thee repository name is simply a variable that is used as the displayed "Repository Name" in the Prisma Cloud Console.
-            // It does NOT actually match a directory name in the code repository itself
-            //
-            prismaCloudScanCode excludedPaths: '', explicitFiles: '', logLevel: 'info', pythonVersion: '', repositoryName: env.CODE_REPO_SCAN_NAME, repositoryPath: '.', resultsFile: 'prisma-cloud-code-scan-results.json'
-         }
-        }
-END MULTI-LINE COMMENT
-*/
 
 //Stage 4 - Build a docker image on the local host using repository and tag names defined by environment variables
         stage('Container Image Build') {
@@ -86,32 +59,13 @@ prismaCloudScanImage ca: '', cert: '', dockerAddress: 'unix:///var/run/docker.so
         }
 
 
-//Stage 6 - Push the image to an Amazon ECR image repository defined by the environment variables   
-        stage ('Push Image to Registry') {
-        steps {
-           script {
-                    docker.withRegistry(env.ECR_REPOSITORY_URL,env.ECR_DOCKER_CREDENTIAL) {
-                    def testimage = docker.build("${ECR_IMAGE_REPO_NAME}")
-                    testimage.push("${ECR_IMAGE_TAG}")
-            }
-            }
-        }
-        }
-
-    }
 // END Pipeline Actions/Stages
     
 // Post-Build Actions - The post section lets you run the publish step regardless of the scan results
     post {
         always {
-                prismaCloudPublish resultsFilePattern: 'prisma-cloud-code-scan-results.json'
                 prismaCloudPublish resultsFilePattern: 'prisma-cloud-image-scan-results.json'
 			
-		/* REMOVE ATTEMPTED EMAIL NOTIFICATION FOR NOW
-			emailext attachLog: true, attachmentsPattern: '*.json', body: '$DEFAULT_CONTENT', subject: '$DEFAULT_SUBJECT', to: 'bgoldstein@paloaltonetworks.com'
-			emailextrecipients([developers()])
-			cleanWs()
-        */
         }
     }
 }
