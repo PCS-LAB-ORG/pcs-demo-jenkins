@@ -15,6 +15,7 @@ pipeline {
         ECR_REPOSITORY_URL="https://${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
         GITHUB_REPO_URL="https://github.com/PCS-LAB-ORG/pcs-demo-jenkins.git"
         CODE_REPO_SCAN_NAME="PCS Demo Log4J Code"
+	IMAGE_SCAN_RESULTS_FILE="prisma-cloud-image-scan-results.json"
     }
 
 //BEGIN Pipeline Actions / Stages
@@ -37,6 +38,7 @@ pipeline {
                     echo "ECR_REPOSITORY_URL=${env.ECR_REPOSITORY_URL}"
                     echo "ECR_DOCKER_CREDENTIALL=${env.ECR_DOCKER_CREDENTIAL}"
                     echo "GITHUB_REPO_URL=${env.GITHUB_REPO_URL}"
+		    echo "IMAGE_SCAN_RESULTS_FILE="${IMAGE_SCAN_RESULTS_FILE}"
                 	}
         	}
         				}
@@ -62,7 +64,7 @@ pipeline {
                     logLevel: 'info',
                     podmanPath: '',
                     project: '',
-                    resultsFile: 'prisma-cloud-scan-results.json',
+                    resultsFile: "${env.IMAGE_SCAN_RESULTS_FILE}",
                     sbom: '',
                     ignoreImageBuildTime: true
         	}
@@ -73,7 +75,7 @@ pipeline {
 
 post {
     always {
-	prismaCloudPublish resultsFilePattern: 'prisma-cloud-image-scan-results.json'
+	prismaCloudPublish resultsFilePattern: "${env.IMAGE_SCAN_RESULTS_FILE}"
 			}
     }
 
