@@ -54,7 +54,17 @@ pipeline {
         stage('Prisma Cloud Container Image Scan') {
         steps {
                 // Scan the built docker image specified by the environment variables
-prismaCloudScanImage ca: '', cert: '', dockerAddress: 'unix:///var/run/docker.sock', image: "${env.LOCAL_DOCKER_IMAGE_REPO}:${env.LOCAL_DOCKER_IMAGE_TAG"}, key: '', logLevel: 'info', podmanPath: '', project: '', resultsFile: 'prisma-cloud-scan-results.json', sbom: ''
+                prismaCloudScanImage ca: '', 
+                    cert: '',
+                    dockerAddress: 'unix:///var/run/docker.sock',
+                    image: "${env.LOCAL_DOCKER_IMAGE_REPO}:${env.LOCAL_DOCKER_IMAGE_TAG"},
+                    key: '',
+                    logLevel: 'info',
+                    podmanPath: '',
+                    project: '',
+                    resultsFile: 'prisma-cloud-scan-results.json',
+                    sbom: '',
+                    ignoreImageBuildTime: true
         	}
         					}
 
