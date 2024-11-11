@@ -23,15 +23,6 @@ spec:
     }
   }
 
-/* Disable this for troubleshooting
-
-environment {
-        // Assign Docker credentials to an environment variable
-        DOCKER_CONFIG_JSON=credentials('bgoldstein-dockerhub-cred')
-    }
-*/
-
-
   stages {
     stage('Build with Kaniko') {
       environment {
