@@ -38,7 +38,7 @@ spec:
 
         // Write Docker Credentials to a file
                script {
-                   def data = ${DOCKER_CONFIG_JSON}
+                   def data = ${env.DOCKER_CONFIG_JSON}
                    writeFile(file: '/kaniko/.docker/config.json', text: data)
                    sh "ls -lsah /kaniko/.docker/"
                }
