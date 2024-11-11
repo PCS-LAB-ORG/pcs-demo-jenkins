@@ -41,11 +41,9 @@ spec:
 
         // Write Docker Credentials to a file
         withCredentials([file(credentialsId: 'bgoldstein-dockerhub-cred', variable: 'DOCKER_CONFIG_JSON')]) {
-                withEnv(['PATH+EXTRA=/busybox']) {
                 sh '''#!/busybox/sh
-                #    cp \$DOCKER_CONFIG_JSON /kaniko/.docker/config.json
+                    cp \$DOCKER_CONFIG_JSON /kaniko/.docker/config.json
                     '''
-                    }
                 }
 
         // Build the docker image using Kaniko
