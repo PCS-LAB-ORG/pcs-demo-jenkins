@@ -59,8 +59,17 @@ environment {
           sh '''#!/busybox/sh
             /kaniko/executor --context `pwd` --verbosity debug --destination bgpanw/cloudbees:latest
           '''
-        }
-      }
+// END CONTAINER
+          }
+
+// END STEPS for Build with Kaniko
+            }
+
+// END STAGE Build with Kaniko
     }
-  }
+
+// END ALL STAGES
+      }  
+
+// END PIPELINE
 }
