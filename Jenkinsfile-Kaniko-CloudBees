@@ -19,6 +19,9 @@ spec:
     command:
     - /busybox/cat
     tty: true
+    volumeMounts:
+      - name: jenkins-docker-cfg
+        mountPath: /kaniko/.docker
 """
     }
   }
