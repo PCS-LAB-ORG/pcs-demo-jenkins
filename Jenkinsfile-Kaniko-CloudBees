@@ -23,6 +23,11 @@ spec:
     }
   }
 
+  environment {
+        // Assign Docker credentials to an environment variable
+        DOCKER_CONFIG_JSON=credentials('bgoldstein-dockerhub-cred')
+    }
+
   stages {
     stage('Build with Kaniko') {
       environment {
@@ -32,7 +37,11 @@ spec:
         container(name: 'kaniko', shell: '/busybox/sh') {
 
         // Write Docker Credentials to a file
-        withCredentials([file(credentialsId: 'bgoldstein-dockerhub-cred', variable: 'DOCKER_CONFIG_JSON')])
+               script {
+                   def data = ${DOCKER_CONFIG_JSON}
+                   writeFile(file: '/kaniko/.docker/config.json', text: data)
+                   sh "ls -lsah /kaniko/.docker/"
+               }
 
         // Create a Dockerfile
           writeFile file: "Dockerfile", text: """
