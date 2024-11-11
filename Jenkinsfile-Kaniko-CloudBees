@@ -34,6 +34,7 @@ spec:
 """
     }
   }
+
   stages {
     stage('Build with Kaniko') {
       environment {
@@ -42,14 +43,19 @@ spec:
       steps {
         container(name: 'kaniko', shell: '/busybox/sh') {
 
+        // Write Docker Credentials to a file
+        withCredentials([file(credentialsId: 'bgoldstein-dockerhub-cred', variable: 'DOCKER_CONFIG_JSON')])
+
+        // Create a Dockerfile
           writeFile file: "Dockerfile", text: """
             FROM jenkins/agent
             MAINTAINER CloudBees Support Team <support@cloudbees.com>
             RUN mkdir /home/jenkins/.m2
           """
 
+        // Build the docker image using Kaniko
           sh '''#!/busybox/sh
-            /kaniko/executor --context `pwd` --verbosity debug --destination cloudbees/jnlp-from-kaniko:latest
+            /kaniko/executor --context `pwd` --verbosity debug --destination bgpanw/cloudbees:latest
           '''
         }
       }
