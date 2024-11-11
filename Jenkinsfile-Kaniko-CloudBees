@@ -22,11 +22,14 @@ spec:
     }
   }
 
+/* Disable this for troubleshooting
 
 environment {
         // Assign Docker credentials to an environment variable
         DOCKER_CONFIG_JSON=credentials('bgoldstein-dockerhub-cred')
     }
+*/
+
 
   stages {
     stage('Build with Kaniko') {
@@ -36,18 +39,21 @@ environment {
       steps {
         container(name: 'kaniko', shell: '/busybox/sh') {
 
-        // Write Docker Credentials to a file
-           writeFile file: "/kaniko/.docker/config.json", text: """
-              ${env.DOCKER_CONFIG_JSON}
-           """
-           sh "ls -lsah /kaniko/.docker/"
-
         // Create a Dockerfile
           writeFile file: "Dockerfile", text: """
             FROM jenkins/agent
             MAINTAINER CloudBees Support Team <support@cloudbees.com>
             RUN mkdir /home/jenkins/.m2
           """
+
+        // Write Docker Credentials to a file
+        withCredentials([file(credentialsId: 'bgoldstein-dockerhub-cred', variable: 'DOCKER_CONFIG_JSON')]) {
+                withEnv(['PATH+EXTRA=/busybox']) {
+                sh '''#!/busybox/sh
+                #    cp \$DOCKER_CONFIG_JSON /kaniko/.docker/config.json
+                    '''
+                    }
+                }
 
         // Build the docker image using Kaniko
           sh '''#!/busybox/sh
