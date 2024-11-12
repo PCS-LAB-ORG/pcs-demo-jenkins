@@ -5,7 +5,7 @@ ARG TWISTCLI_USER=default_value
 ARG TWISTCLI_PW=default_value
 
 #Download current TwistCLI binary
-RUN curl -o https://$TWISTCLI_USER:$TWISTCLI_PW@https://us-east1.cloud.twistlock.com/us-2-158320372/util/twistcli
+RUN curl -o "https://$TWISTCLI_USER:$TWISTCLI_PW@https://us-east1.cloud.twistlock.com/us-2-158320372/util/twistcli"
 
 #Execute image scan from within this container
 RUN ./twistcli images scan --containerized --address https://us-east1.cloud.twistlock.com/us-2-158320372 --user $TWISTCLI_USER --password $TWISTCLI_PW pcs-log4j-conainerized
