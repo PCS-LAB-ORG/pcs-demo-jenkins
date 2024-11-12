@@ -1,4 +1,5 @@
 // Kaniko docker build pipeline from tutorial at : https://gist.github.com/darinpope/f4e52152ce9106610e51fe53ccabe512
+// change destination to our own service account's repo in Docker Hub
 
 
 pipeline {
@@ -36,7 +37,7 @@ spec:
         container(name: 'kaniko', shell: '/busybox/sh') {
           sh '''#!/busybox/sh
             echo "FROM jenkins/inbound-agent:latest" > Dockerfile
-            /kaniko/executor --context `pwd` --destination darinpope/hello-kaniko:latest
+            /kaniko/executor --context `pwd` --destination svcpcslab/hello-kaniko:latest
           '''
         }
       }
