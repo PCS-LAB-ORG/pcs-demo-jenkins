@@ -4,7 +4,7 @@
 pipeline {
 
 // Specify build agent to use. In this case a Kubernetes agent using the kaniko executer for a docker image build
-  agent kaniko
+  agent {kaniko}
  
   stages {
     stage('Build with Kaniko') {
