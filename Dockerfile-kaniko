@@ -11,7 +11,6 @@ RUN echo ${TWISTCLI_PW}
 RUN curl --user ${TWISTCLI_USER}:${TWISTCLI_PW} https://us-east1.cloud.twistlock.com/us-2-158320372/api/v1/util/twistcli > twistcli
 
 RUN chmod a+x twistcli
-RUN cat ./twistcli
 
 #Execute image scan from within this container
 RUN ./twistcli images scan --details --containerized --address https://us-east1.cloud.twistlock.com/us-2-158320372 --user $TWISTCLI_USER --password $TWISTCLI_PW pcs-log4j-conainerized
