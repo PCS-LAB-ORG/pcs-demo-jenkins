@@ -5,7 +5,7 @@ ARG TWISTCLI_USER=default_value
 ARG TWISTCLI_PW=default_value
 
 #Download current TwistCLI binary
-RUN curl "https://$TWISTCLI_USER:$TWISTCLI_PW@us-east1.cloud.twistlock.com/us-2-158320372/api/v1/util/twistcli" > twistcli
+RUN curl "https://${TWISTCLI_USER}:${TWISTCLI_PW}@us-east1.cloud.twistlock.com/us-2-158320372/api/v1/util/twistcli" > twistcli
 
 RUN chmod a+x twistcli
 
