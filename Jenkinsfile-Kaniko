@@ -33,14 +33,42 @@ pipeline {
     }
   }
 
+  environment {
+
+    //Assign Credentials from GCP Secrets Plugin to a pipeline environment variable
+    TWISTCLI_CRED=credentials('app2-pcs-lab-pcs-demo-cicd-svc')
+    TWISTCLI_USER=${env.TWISTCLI_CRED_USR}
+    TWISTCLI_PW=${env.TWISTCLI_CRED_PSW}
+    IMAGE_REGISTRY="docker.io"
+    IMAGE_REPO="/svcpcslab/kaniko-log4j"
+    IMAGE_TAG=":latest"
+    IMAGE_DESTINATION="${IMAGE_REGISTRY}${IMAGE_REPO}${IMAGE_TAG}"
+    DOCKERFILE_NAME="Dockerfile-kaniko"
+
+}
+  
   stages {
     stage('Build with Kaniko') {
       steps {
         container(name: 'kaniko', shell: '/busybox/sh') {
+          sh '''
+            
+          /kaniko/executor --dockerfile "`pwd`"/$DOCKERFILE_NAME \
+                           --cleanup \
+                           --verbosity=info \
+                           --context "`pwd`" \
+                           --destination=$IMAGE_DESTINATION \
+                           --build-arg TWISTCLI_USER=$TWISTCLI_CRED_USR \
+                           --build-arg TWISTCLI_PW=$TWISTCLI_CRED_PSW
+              '''
+
+/* DISABLE DEMO SCRIPT
           sh '''#!/busybox/sh
             echo "FROM jenkins/inbound-agent:latest" > Dockerfile
             /kaniko/executor --context `pwd` --destination svcpcslab/hello-kaniko:latest
           '''
+*/
+
         }
       }
     }
