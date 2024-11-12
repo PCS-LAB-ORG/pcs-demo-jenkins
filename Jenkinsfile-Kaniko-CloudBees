@@ -1,28 +1,11 @@
 // Kaniko demo from CloudBees site: https://docs.cloudbees.com/docs/cloudbees-ci-kb/latest/cloudbees-ci-on-modern-cloud-platforms/what-you-need-to-know-when-using-kaniko-from-kubernetes-jenkins-agents
 
+// BEGIN PIPELINE SCRIPT
 pipeline {
-  agent {
-    kubernetes {
-      label 'example-kaniko-volumes'
-      yaml """
-kind: Pod
-metadata:
-  name: kaniko
-spec:
-  containers:
-  - name: jnlp
-    workingDir: /tmp/jenkins
-  - name: kaniko
-    workingDir: /tmp/jenkins
-    image: gcr.io/kaniko-project/executor:debug
-    imagePullPolicy: Always
-    command:
-    - /busybox/cat
-    tty: true
-"""
-    }
-  }
 
+// Specify build agent to use. In this case a Kubernetes agent using the kaniko executer for a docker image build
+  agent kaniko
+ 
   stages {
     stage('Build with Kaniko') {
       environment {
