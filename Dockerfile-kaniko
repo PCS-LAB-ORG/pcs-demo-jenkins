@@ -1,6 +1,11 @@
 FROM imiell/bad-dockerfile:latest
+
+#Assign environment variables from the Docker build parameters arguments
 ARG TWISTCLI_USER=default_value
 ARG TWISTCLI_PW=default_value
 
-#Execute image scan
-RUN /prisma/twistcli-22-12-699 images scan --containerized --address https://us-east1.cloud.twistlock.com/us-2-158320372 --user $TWISTCLI_USER --password $TWISTCLI_PW pcs-log4j-conainerized
+#Download current TwistCLI binary
+RUN curl -o https://$TWISTCLI_USER:$TWISTCLI_PW@https://us-east1.cloud.twistlock.com/us-2-158320372/util/twistcli
+
+#Execute image scan from within this container
+RUN ./twistcli images scan --containerized --address https://us-east1.cloud.twistlock.com/us-2-158320372 --user $TWISTCLI_USER --password $TWISTCLI_PW pcs-log4j-conainerized
