@@ -3,8 +3,8 @@
 // BEGIN PIPELINE SCRIPT
 pipeline {
 
-// Specify build agent to use. In this case a Kubernetes agent using the kaniko executer for a docker image build
-  agent {kaniko}
+// Specify build agent to use. In this case a Kubernetes agent using the kaniko executer for a docker image build. Specify the agent using a label parameter instead of a type.
+  agent {label 'kaniko'}
  
   stages {
     stage('Build with Kaniko') {
