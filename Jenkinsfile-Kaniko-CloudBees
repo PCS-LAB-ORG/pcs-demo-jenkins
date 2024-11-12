@@ -1,3 +1,6 @@
+// Kaniko docker build pipeline from tutorial at : https://gist.github.com/darinpope/f4e52152ce9106610e51fe53ccabe512
+
+
 pipeline {
   agent {
     kubernetes {
