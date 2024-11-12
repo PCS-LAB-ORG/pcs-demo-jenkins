@@ -37,8 +37,8 @@ pipeline {
 
     //Assign Credentials from GCP Secrets Plugin to a pipeline environment variable
     TWISTCLI_CRED=credentials('app2-pcs-lab-pcs-demo-cicd-svc')
-    TWISTCLI_USER="${env.TWISTCLI_CRED_USR}"
-    TWISTCLI_PW="${env.TWISTCLI_CRED_PSW}"
+  #  TWISTCLI_USER="${env.TWISTCLI_CRED_USR}"
+  #  TWISTCLI_PW="${env.TWISTCLI_CRED_PSW}"
     IMAGE_REGISTRY="docker.io"
     IMAGE_REPO="/svcpcslab/kaniko-log4j"
     IMAGE_TAG=":latest"
