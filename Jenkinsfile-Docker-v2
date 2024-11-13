@@ -3,6 +3,7 @@ pipeline {
 
 // Declare Pipeline Environment Variables
     environment {
+        DOCKERHUB_CREDENTIALS=credentials(docker-hub-svcpcslab-jenkins-access-token)
         DOCKERHUB_IMAGE_REPO="svcpcslab/jenkins-log4j"
         DOCKERHUB_IMAGE_TAG="1.1"
 	    IMAGE_SCAN_RESULTS_FILE="prisma-cloud-image-scan-results.json"
@@ -28,8 +29,7 @@ pipeline {
             steps {
                 // Build an image for scanning
                 echo 'Starting to build docker image'
-                script {
-                    def dockerImage = docker.build DOCKERHUB_IMAGE_REPO + ":$DOCKERHUB_IMAGE_TAG"
+                sh 'docker build --no-cache -t ${DOCKERHUB_IMAGE_REPO}:${DOCKERHUB_IMAGE_TAG} .'
                         }
         	        }
         				                }
@@ -51,20 +51,22 @@ pipeline {
                         ignoreImageBuildTime: true
                     }
         					                    }
+//Stage 6 - Docker Login
+    stage('Docker Login') {
+        steps {
+            sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+        }
 
-//Stage 6 - Push the image to a Docker registry if the image scan passed
+    }
+
+//Stage 7 - Push the image to a Docker registry if the image scan passed
 	stage('Docker Push') {
         steps {
-            script {
-                def dockerImage = docker.image(DOCKERHUB_IMAGE_REPO + ":$DOCKERHUB_IMAGE_TAG")
-                docker.withRegistry('', docker-hub-svcpcslab-jenkins-access-token ) {
-                dockerImage.push()
-                                                            }
-                    }
-                }
-                        }
+            sh 'docker push ${DOCKERHUB_IMAGE_REPO}:DOCKERHUB_IMAGE_TAG}'
+        }
+    }
 
-//Stage 7 - Local Docker cleanup
+//Stage 8 - Local Docker cleanup
 	stage('Cleaning up') { 
         steps { 
             sh "docker rmi $DOCKERHUB_IMAGE_REPO:$DOCKERHUB_IMAGE_TAG" 
