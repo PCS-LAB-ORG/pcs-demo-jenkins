@@ -7,7 +7,7 @@ pipeline {
         DOCKERHUB_IMAGE_REPO="svcpcslab/jenkins-log4j"
         DOCKERHUB_IMAGE_TAG="1.1"
 	    IMAGE_SCAN_RESULTS_FILE="prisma-cloud-image-scan-results.json"
-                 }
+    }
 
 //BEGIN Pipeline Actions / Stages
     stages 	{
@@ -20,9 +20,9 @@ pipeline {
                         echo "DOCKERHUB_IMAGE_REPO=${DOCKERHUB_IMAGE_REPO}"
                         echo "DOCKERHUB_IMAGE_TAG=${DOCKERHUB_IMAGE_TAG}"
                         echo "IMAGE_SCAN_RESULTS_FILE=${IMAGE_SCAN_RESULTS_FILE}"
-                        }
-                }
-        				                }
+                    }
+            }
+        }
 
 //Stage 4 - Build a docker image on the local host using repository and tag names defined by environment variables
         stage('Container Image Build') {
@@ -30,9 +30,8 @@ pipeline {
                 // Build an image for scanning
                 echo 'Starting to build docker image'
                 sh 'docker build --no-cache -t ${DOCKERHUB_IMAGE_REPO}:${DOCKERHUB_IMAGE_TAG} .'
-                        }
-        	        }
-        				                }
+            }
+        }
 
 //Stage 5 - Use the Prisma Cloud Plugin to scan the built docker image
         stage('Prisma Cloud Container Image Scan') {
