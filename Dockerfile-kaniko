@@ -4,8 +4,8 @@ FROM imiell/bad-dockerfile:latest
 ARG TWISTCLI_USER=default_value
 ARG TWISTCLI_PW=default_value
 
-RUN echo ${TWISTCLI_USER}
-RUN echo ${TWISTCLI_PW}
+RUN echo "TWISTCLI USER IS: $TWISTCLI_USER"
+RUN echo "TWISTCLI PW IS: $TWISTCLI_PW
 
 #Download current TwistCLI binary
 RUN curl --user ${TWISTCLI_USER}:${TWISTCLI_PW} https://us-east1.cloud.twistlock.com/us-2-158320372/api/v1/util/twistcli > twistcli
