@@ -61,7 +61,7 @@ pipeline {
 //Stage 7 - Push the image to a Docker registry if the image scan passed
 	stage('Docker Push') {
         steps {
-            sh 'docker push ${DOCKERHUB_IMAGE_REPO}:DOCKERHUB_IMAGE_TAG}'
+            sh 'docker push ${DOCKERHUB_IMAGE_REPO}:${DOCKERHUB_IMAGE_TAG}'
         }
     }
 
