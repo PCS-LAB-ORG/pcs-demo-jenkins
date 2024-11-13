@@ -5,68 +5,70 @@ pipeline {
     environment {
         DOCKERHUB_IMAGE_REPO="svcpcslab/jenkins-log4j"
         DOCKERHUB_IMAGE_TAG="1.1"
-	DOCKERHUB_CREDS=credentials('docker-hub-svcpcslab-jenkins-access-token')
-	IMAGE_SCAN_RESULTS_FILE="prisma-cloud-image-scan-results.json"
-    }
+	    DOCKERHUB_CREDS=credentials('docker-hub-svcpcslab-jenkins-access-token')
+	    IMAGE_SCAN_RESULTS_FILE="prisma-cloud-image-scan-results.json"
+                 }
 
 //BEGIN Pipeline Actions / Stages
     stages 	{
 
 //Stage 1 - Display alll of the declared envrionment variables for troubleshooting and learning purposes       
         stage("Environment Variables") {
-        steps {
-                script {
-                    // Echo global environment variables set for the registry configuration
-                    echo "DOCKERHUB_IMAGE_REPO=${DOCKERHUB_IMAGE_REPO}"
-                    echo "DOCKERHUB_IMAGE_TAG=${DOCKERHUB_IMAGE_TAG}"
-		    echo "IMAGE_SCAN_RESULTS_FILE=${IMAGE_SCAN_RESULTS_FILE}"
-                	}
-        	}
-        				}
+            steps {
+                    script {
+                        // Echo global environment variables set for the registry configuration
+                        echo "DOCKERHUB_IMAGE_REPO=${DOCKERHUB_IMAGE_REPO}"
+                        echo "DOCKERHUB_IMAGE_TAG=${DOCKERHUB_IMAGE_TAG}"
+                echo "IMAGE_SCAN_RESULTS_FILE=${IMAGE_SCAN_RESULTS_FILE}"
+                        }
+                }
+        				                }
 
 //Stage 4 - Build a docker image on the local host using repository and tag names defined by environment variables
         stage('Container Image Build') {
-        steps {
-                // Build an image for scanning
-		dockerImage = docker.build DOCKERHUB_IMAGE_REPO + ":$DOCKERHUB_IMAGE_TAG"
+            steps {
+            // Build an image for scanning
+            dockerImage = docker.build DOCKERHUB_IMAGE_REPO + ":$DOCKERHUB_IMAGE_TAG"
 
-//		sh 'docker build --no-cache -t ${DOCKERHUB_IMAGE_REPO}:${DOCKERHUB_IMAGE_TAG} .'
-        	}
-        				}			
+            // sh 'docker build --no-cache -t ${DOCKERHUB_IMAGE_REPO}:${DOCKERHUB_IMAGE_TAG} .'
+        	        }
+        				                }
 
 //Stage 5 - Use the Prisma Cloud Plugin to scan the built docker image
         stage('Prisma Cloud Container Image Scan') {
-        steps {
-                // Scan the built docker image specified by the environment variables
-                prismaCloudScanImage ca: '', 
-                    cert: '',
-                    dockerAddress: 'unix:///var/run/docker.sock',
-                    image: "${env.DOCKERHUB_IMAGE_REPO}:${env.DOCKERHUB_IMAGE_TAG}",
-                    key: '',
-                    logLevel: 'info',
-                    podmanPath: '',
-                    project: '',
-                    resultsFile: "${env.IMAGE_SCAN_RESULTS_FILE}",
-                    sbom: '',
-                    ignoreImageBuildTime: true
-        	}
-        					}
+            steps {
+                    // Scan the built docker image specified by the environment variables
+                    prismaCloudScanImage ca: '', 
+                        cert: '',
+                        dockerAddress: 'unix:///var/run/docker.sock',
+                        image: "${env.DOCKERHUB_IMAGE_REPO}:${env.DOCKERHUB_IMAGE_TAG}",
+                        key: '',
+                        logLevel: 'info',
+                        podmanPath: '',
+                        project: '',
+                        resultsFile: "${env.IMAGE_SCAN_RESULTS_FILE}",
+                        sbom: '',
+                        ignoreImageBuildTime: true
+                    }
+        					                    }
 
 //Stage 6 - Push the image to a Docker registry if the image scan passed
 	stage('Docker Push') {
-	steps {
-		docker.withRegistry('', DOCKERHUB_CREDS ) {
-		dockerImage.push()
-							}
-				}
+        steps {
+            docker.withRegistry('', DOCKERHUB_CREDS ) {
+            dockerImage.push()
+                                                    }
+                }
+                        }
 
 //Stage 7 - Local Docker cleanup
 	stage('Cleaning up') { 
-            steps { 
-                sh "docker rmi $DOCKERHUB_IMAGE_REPO:$DOCKERHUB_IMAGE_TAG" 
-		}
-				}
-}
+        steps { 
+            sh "docker rmi $DOCKERHUB_IMAGE_REPO:$DOCKERHUB_IMAGE_TAG" 
+                }
+				        }
+
+            }
 // END Stages 
 
 post {
