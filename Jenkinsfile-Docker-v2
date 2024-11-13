@@ -56,9 +56,11 @@ pipeline {
 //Stage 6 - Push the image to a Docker registry if the image scan passed
 	stage('Docker Push') {
         steps {
-            docker.withRegistry('', DOCKERHUB_CREDS ) {
-            dockerImage.push()
-                                                    }
+            script {
+                docker.withRegistry('', DOCKERHUB_CREDS ) {
+                dockerImage.push()
+                                                            }
+                    }
                 }
                         }
 
