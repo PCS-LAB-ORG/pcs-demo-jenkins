@@ -19,7 +19,7 @@ pipeline {
                         // Echo global environment variables set for the registry configuration
                         echo "DOCKERHUB_IMAGE_REPO=${DOCKERHUB_IMAGE_REPO}"
                         echo "DOCKERHUB_IMAGE_TAG=${DOCKERHUB_IMAGE_TAG}"
-                echo "IMAGE_SCAN_RESULTS_FILE=${IMAGE_SCAN_RESULTS_FILE}"
+                        echo "IMAGE_SCAN_RESULTS_FILE=${IMAGE_SCAN_RESULTS_FILE}"
                         }
                 }
         				                }
@@ -27,8 +27,11 @@ pipeline {
 //Stage 4 - Build a docker image on the local host using repository and tag names defined by environment variables
         stage('Container Image Build') {
             steps {
-            // Build an image for scanning
-            def dockerImage = docker.build DOCKERHUB_IMAGE_REPO + ":$DOCKERHUB_IMAGE_TAG"
+                // Build an image for scanning
+                echo 'Starting to build docker image'
+                script {
+                    def dockerImage = docker.build DOCKERHUB_IMAGE_REPO + ":$DOCKERHUB_IMAGE_TAG"
+                        }
         	        }
         				                }
 
