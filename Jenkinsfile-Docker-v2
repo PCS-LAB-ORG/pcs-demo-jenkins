@@ -5,6 +5,7 @@ pipeline {
     environment {
         DOCKERHUB_IMAGE_REPO="svcpcslab/jenkins-log4j"
         DOCKERHUB_IMAGE_TAG="1.1"
+	DOCKERHUB_CREDS=credentials('docker-hub-svcpcslab-jenkins-access-token')
 	IMAGE_SCAN_RESULTS_FILE="prisma-cloud-image-scan-results.json"
     }
 
@@ -54,7 +55,7 @@ pipeline {
 //Stage 6 - Push the image to a Docker registry if the image scan passed
 	stage('Docker Push') {
 	steps {
-		docker.withRegistry('', registryCredential ) {
+		docker.withRegistry('', DOCKERHUB_CREDS ) {
 		dockerImage.push()
 
 		}
