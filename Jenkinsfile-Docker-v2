@@ -3,7 +3,7 @@ pipeline {
 
 // Declare Pipeline Environment Variables
     environment {
-        DOCKERHUB_CREDENTIALS=credentials(docker-hub-svcpcslab-jenkins-access-token)
+        DOCKERHUB_CREDENTIALS=credentials('docker-hub-svcpcslab-jenkins-access-token')
         DOCKERHUB_IMAGE_REPO="svcpcslab/jenkins-log4j"
         DOCKERHUB_IMAGE_TAG="1.1"
 	    IMAGE_SCAN_RESULTS_FILE="prisma-cloud-image-scan-results.json"
