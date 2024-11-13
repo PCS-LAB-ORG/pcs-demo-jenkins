@@ -57,8 +57,7 @@ pipeline {
 	steps {
 		docker.withRegistry('', DOCKERHUB_CREDS ) {
 		dockerImage.push()
-
-		}
+							}
 				}
 
 //Stage 7 - Local Docker cleanup
@@ -66,6 +65,7 @@ pipeline {
             steps { 
                 sh "docker rmi $DOCKERHUB_IMAGE_REPO:$DOCKERHUB_IMAGE_TAG" 
 		}
+				}
 
 // END Stages 
 
