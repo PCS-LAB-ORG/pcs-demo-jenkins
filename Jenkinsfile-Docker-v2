@@ -28,9 +28,7 @@ pipeline {
         stage('Container Image Build') {
             steps {
             // Build an image for scanning
-            dockerImage = docker.build DOCKERHUB_IMAGE_REPO + ":$DOCKERHUB_IMAGE_TAG"
-
-            // sh 'docker build --no-cache -t ${DOCKERHUB_IMAGE_REPO}:${DOCKERHUB_IMAGE_TAG} .'
+            def dockerImage = docker.build DOCKERHUB_IMAGE_REPO + ":$DOCKERHUB_IMAGE_TAG"
         	        }
         				                }
 
