@@ -56,7 +56,7 @@ pipeline {
 	stage('Docker Push') {
         steps {
             script {
-                docker.withRegistry("${DOCKERHUB_IMAGE_REPO}"+"${DOCKERHUB_IMAGE_TAG"}, docker-hub-svcpcslab-jenkins-access-token ) {
+                docker.withRegistry("${DOCKERHUB_IMAGE_REPO}"+"${DOCKERHUB_IMAGE_TAG}", docker-hub-svcpcslab-jenkins-access-token ) {
                 dockerImage.push()
                                                             }
                     }
