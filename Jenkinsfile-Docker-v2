@@ -3,9 +3,8 @@ pipeline {
 
 // Declare Pipeline Environment Variables
     environment {
-        LOCAL_DOCKER_IMAGE_REPO="pcs-jenkins-demo/jenkins-log4j"
-        LOCAL_DOCKER_IMAGE_TAG="0.3"
-        GITHUB_REPO_URL="https://github.com/PCS-LAB-ORG/pcs-demo-jenkins.git"
+        DOCKERHUB_IMAGE_REPO="svcpcslab/jenkins-log4j"
+        DOCKERHUB_IMAGE_TAG="1.1"
 	IMAGE_SCAN_RESULTS_FILE="prisma-cloud-image-scan-results.json"
     }
 
@@ -17,20 +16,20 @@ pipeline {
         steps {
                 script {
                     // Echo global environment variables set for the registry configuration
-                    echo "LOCAL_DOCKER_IMAGE_REPO=${LOCAL_DOCKER_IMAGE_REPO}"
-                    echo "LOCAL_DOCKER_IMAGE_TAG=${LOCAL_DOCKER_IMAGE_TAG}"
-                    echo "GITHUB_REPO_URL=${env.GITHUB_REPO_URL}"
+                    echo "DOCKERHUB_IMAGE_REPO=${DOCKERHUB_IMAGE_REPO}"
+                    echo "DOCKERHUB_IMAGE_TAG=${DOCKERHUB_IMAGE_TAG}"
 		    echo "IMAGE_SCAN_RESULTS_FILE=${IMAGE_SCAN_RESULTS_FILE}"
                 	}
         	}
         				}
 
-
 //Stage 4 - Build a docker image on the local host using repository and tag names defined by environment variables
         stage('Container Image Build') {
         steps {
                 // Build an image for scanning
-                sh 'docker build --no-cache -t ${LOCAL_DOCKER_IMAGE_REPO}:${LOCAL_DOCKER_IMAGE_TAG} .'
+		dockerImage = docker.build DOCKERHUB_IMAGE_REPO + ":$DOCKERHUB_IMAGE_TAG"
+
+//		sh 'docker build --no-cache -t ${DOCKERHUB_IMAGE_REPO}:${DOCKERHUB_IMAGE_TAG} .'
         	}
         				}			
 
@@ -41,7 +40,7 @@ pipeline {
                 prismaCloudScanImage ca: '', 
                     cert: '',
                     dockerAddress: 'unix:///var/run/docker.sock',
-                    image: "${env.LOCAL_DOCKER_IMAGE_REPO}:${env.LOCAL_DOCKER_IMAGE_TAG}",
+                    image: "${env.DOCKERHUB_IMAGE_REPO}:${env.DOCKERHUB_IMAGE_TAG}",
                     key: '',
                     logLevel: 'info',
                     podmanPath: '',
@@ -52,7 +51,21 @@ pipeline {
         	}
         					}
 
-}
+//Stage 6 - Push the image to a Docker registry if the image scan passed
+	stage('Docker Push') {
+	steps {
+		docker.withRegistry('', registryCredential ) {
+		dockerImage.push()
+
+		}
+				}
+
+//Stage 7 - Local Docker cleanup
+	stage('Cleaning up') { 
+            steps { 
+                sh "docker rmi $DOCKERHUB_IMAGE_REPO:$DOCKERHUB_IMAGE_TAG" 
+		}
+
 // END Stages 
 
 post {
