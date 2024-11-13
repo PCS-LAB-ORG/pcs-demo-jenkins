@@ -66,7 +66,7 @@ pipeline {
                 sh "docker rmi $DOCKERHUB_IMAGE_REPO:$DOCKERHUB_IMAGE_TAG" 
 		}
 				}
-
+}
 // END Stages 
 
 post {
